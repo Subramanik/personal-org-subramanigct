@@ -1,40 +1,45 @@
 # This workflow will build a Java project with Ant
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-ant
 
-name: My First CI
-
+name: Validate against Salesforce Org
 on:
   push:
     branches:
     - main
-    - release/*
   pull_request:
     branches:
     - main
-  schedule:
-    - cron: "0 2 * * 1-5"
+  paths-ignore:
+    - 'sfdx-project.json'
+    - 'READ.md'
+    - 'SECURITY.md'
+    - 'package.json'
+    - 'sfdx-project.json'
+  workflow_dispatch:
 
 jobs:
-  build:
-    name: build
+  environment-setup:
+  
+    name: environment-setup
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 11
-      uses: actions/setup-java@v2
-      with:
-        java-version: '11'
-        distribution: 'temurin'
-    - name: Build with Ant
-      run: ant -noinput -buildfile build.xml
+    
+    - name: 'Checkout Source Code'
+      uses: actions/checkout@v2
       
-  test:
-    name: test
-    needs: [build]
+    - name: 'Setup Node.js environment'
+      uses: actions/setup-node@v2-beta
+      with:
+        java-version: '12'
+      
+  validate:
+    name: validate
+    needs: [environment-setup]
     runs-on: ubuntu-latest
 
     steps:
+     - name: 'Install Salesforce CLI
     - uses: actions/checkout@v2
     - name: Set up JDK 11
       uses: actions/setup-java@v2
